@@ -186,7 +186,7 @@ function $(){
 (function(){
 	function _$(els){
 		this.elements = [];
-		for(var i = 0,len = els.length;i < len;++i){
+		for(var i = 0,len = els.length;i < len;i++){
 			var element = els[i];
 			if(typeof element === 'string'){
 				element = document.getElementById(element);
@@ -196,8 +196,8 @@ function $(){
 	}
 	_$.prototype = {
 		each: function(fn){
-			for(var i = 0,len = this.elements.length;++i){
-				fn.call(this,this.elements);
+			for(var i = 0,len = this.elements.length;i < len;i++){
+				fn.call(this,this.elements[i]);
 			}
 			return this;
 		},
@@ -229,12 +229,12 @@ function $(){
 			return this;
 		}
 	};
-	window._$ = function(){
-		return _$(arguments);
+	window.$ = function(){
+		return new _$(arguments);
 	};
 })()
 
-
+//调用方法
 $(window).addEvent('load',function(){
 	$('test-1','test-2').show().
 	setStyle('color','red').
@@ -243,7 +243,7 @@ $(window).addEvent('load',function(){
 	});
 });
 
-//语法糖
+//语法糖，避免每次写入prototype
 Function.prototype.method = function(name,fn){
 	this.prototype[name] = fn;
 	return this;
@@ -253,6 +253,8 @@ Function.prototype.method = function(name,fn){
 	function _$(els){
 		//...
 	}
+
+	//改变添加方法到_$.prototype上的方式，添加addEvent方法
 	_$.method('addEvent',function(type,fn){
 		//...
 	});
@@ -262,11 +264,13 @@ Function.prototype.method = function(name,fn){
 		} 
 	};
 })();
+
+//安装器，将_$替换成$
 installHelper(window,'$');
 $('example').show();
 
 
-
+//模仿接口
 var Interface = function(name,methods){
 	if(arguments.length != 2){
 		throw new Error("Interface constructor called with"+arguments.length+"arguments,but excepted exactly 2.");
@@ -319,6 +323,8 @@ var AjaxHandler = new Interface('AjaxHandler',['request','createXhrObject']);
 /*SimpleHandler class*/
 var SimpleHandler = function(){};
 
+
+//工厂模式创建XHR对象
 SimpleHandler.prototype = {
 	request: function(method,url,callback,postVars){
 		var xhr = this.createXhrObject();
@@ -355,7 +361,7 @@ SimpleHandler.prototype = {
 };
 
 
-//shallow copy of an object
+//对象浅复制
 if(typeof Object.create !== 'function'){
 	Object.create = function(o){
 		var F = function(){};
@@ -366,7 +372,7 @@ if(typeof Object.create !== 'function'){
 
 var anothre_stooge = Object.create(stooge);
 
-//deep copy
+//对象和数组深复制
 
 function copyObj(obj){
 	var str,newObj = obj.constructor === "object" ? {} : [];
@@ -385,12 +391,15 @@ function copyObj(obj){
 	return newObj;
 }
 
+//bind函数，绑定对象上执行函数
+
 function bind(fn,obj){
 	return function(){
 		return fn.apply(obj,arguments);
 	}
 }
 
+//格式化输出元素
 function outputAttributes(elemnet){
 	var len,i,attrName,attrValue,pairs = new Array();
 	for(i=0,len=elemnet.attributes.length;i<len;i++){
@@ -401,7 +410,7 @@ function outputAttributes(elemnet){
 	return pairs.join(" ");
 }
 
-
+//动态载入样式
 function loadStyleString(css){
 	var style = document.createElement("style");
 	style.type = "text/css";
