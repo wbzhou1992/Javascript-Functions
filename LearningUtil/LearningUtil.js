@@ -425,4 +425,21 @@ function loadStyleString(css){
 	head.appendChild(style);
 
 }
+//回文字符判断
 
+//给出一个字符，判断是否是回文，比如aabaa是回文
+
+function zigZag(str){
+	if (str==="") {
+		return false;
+	}
+	var len = str.length;
+	for(var i = 0;i < len/2;i++){
+		if(str.charAt(i)!==str.charAt(len-i-1)){
+			return false;
+		}
+	}
+	return true;
+}
+
+//
